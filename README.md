@@ -4,7 +4,7 @@
   <img src="./images/ic_launcher.png" alt="Visual Code Space" width="120" height="120"/>
 </div>
 
-<h1 align="center"><b>Visual Code Space</b></h1>
+<h1 align="center"><b>Visual Code Space Cosio33 Fork</b></h1>
 <p align="center"><b>A Modern Code Editor for Android</b></p>
 
 <div align="center">
