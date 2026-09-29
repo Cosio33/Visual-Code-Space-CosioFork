@@ -1,5 +1,7 @@
 # Built application files
 *.apk
+!app-release.apk
+!vscodev2-debug.apk
 *.aar
 *.ap_
 *.aab
