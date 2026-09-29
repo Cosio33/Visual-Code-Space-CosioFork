@@ -31,10 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.blankj.utilcode.util.ToastUtils
-import com.google.ai.client.generativeai.type.asTextOrNull
 import com.itsvks.monaco.MonacoEditor
 import com.teixeira.vcspace.app.strings
-import com.teixeira.vcspace.core.ai.Gemini
+import com.teixeira.vcspace.core.ai.AiManager
+import com.teixeira.vcspace.core.ai.GeminiProvider
 import com.teixeira.vcspace.ui.screens.editor.components.view.CodeEditorView
 import com.teixeira.vcspace.utils.launchWithProgressDialog
 import kotlinx.coroutines.Dispatchers
@@ -83,18 +83,18 @@ fun GenerateContentDialog(
                                 }
                             }
                         ) { _, _ ->
-                            Gemini.generateCode(
+                            val provider = AiManager.getProvider(context)
+                            provider.generateCode(
                                 prompt = prompt,
                                 fileExtension = fileExtension
                             ).onSuccess { response ->
-                                val text =
-                                    response.candidates.first().content.parts.first().asTextOrNull()
+                                val text = response.text
 
                                 withContext(Dispatchers.Main) {
                                     if (editor is MonacoEditor) {
                                         val position = editor.position
                                         editor.insert(
-                                            text = Gemini.removeBackticksFromMarkdownCodeBlock(text),
+                                            text = GeminiProvider.removeBackticksFromMarkdownCodeBlock(text),
                                             position = position
                                         )
                                     } else if (editor is CodeEditorView) {
@@ -104,7 +104,7 @@ fun GenerateContentDialog(
                                         content.insert(
                                             cursor.leftLine,
                                             cursor.leftColumn,
-                                            Gemini.removeBackticksFromMarkdownCodeBlock(text)
+                                            GeminiProvider.removeBackticksFromMarkdownCodeBlock(text)
                                         )
                                     }
                                 }

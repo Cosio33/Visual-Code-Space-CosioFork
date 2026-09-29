@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.inputmethod.EditorInfo
 import com.teixeira.vcspace.editor.completion.CompletionListAdapter
 import com.teixeira.vcspace.editor.completion.CustomCompletionLayout
+import com.teixeira.vcspace.editor.listener.OnEditCodeListener
 import com.teixeira.vcspace.editor.listener.OnExplainCodeListener
 import com.teixeira.vcspace.editor.listener.OnImportComponentListener
 import com.teixeira.vcspace.file.File
@@ -44,6 +45,7 @@ class VCSpaceEditor @JvmOverloads constructor(
 
     var onExplainCodeListener: OnExplainCodeListener? = null
     var onImportComponentListener: OnImportComponentListener? = null
+    var onEditCodeListener: OnEditCodeListener? = null
 
     val commentRule: CommentRule?
         get() = (editorLanguage as? TextMateLanguage)?.languageConfiguration?.comments

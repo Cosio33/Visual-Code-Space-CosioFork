@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.rounded.ManageSearch
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.ContentCut
 import androidx.compose.material.icons.rounded.ContentPaste
+import androidx.compose.material.icons.rounded.AutoFixHigh
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.SelectAll
 import androidx.compose.material.icons.rounded.TouchApp
@@ -81,5 +82,10 @@ val actionItems = listOf(
         id = R.string.editor_action_import_components,
         icon = Icons.AutoMirrored.Rounded.ManageSearch,
         description = "Import components (Jetpack Compose)."
+    ),
+    EditorTextActionItem(
+        id = R.string.editor_action_edit_with_ai,
+        icon = Icons.Rounded.AutoFixHigh,
+        description = "Edit the selected code using AI."
     )
 )

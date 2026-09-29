@@ -45,6 +45,12 @@
     <string name="editor_action_format">Format</string>
     <string name="editor_action_explain_code">Explain Code</string>
     <string name="editor_action_import_components">Import Compose Components</string>
+    <string name="editor_action_edit_with_ai">Edit with AI</string>
+    <string name="edit_code">Edit Code</string>
+    <string name="edit_code_instructions">What changes do you want to make?</string>
+    <string name="edit_code_instructions_hint">e.g. Add error handling, refactor to use coroutines, optimize performance...</string>
+    <string name="editing_code">Editing code with AI...</string>
+    <string name="apply_changes">Apply Changes</string>
     <string name="editor_redo">Redo</string>
     <string name="editor_undo">Undo</string>
     <string name="editor_reload">Reload editor</string>
@@ -341,4 +347,26 @@
     <string name="tell_me_what_you_want_to_generate">Tell me what you want to generate…</string>
 
     <string name="open_source_licences">Open Source Licences</string>
+
+    <!-- AI Settings -->
+    <string name="pref_configure_ai">AI</string>
+    <string name="pref_configure_ai_summary">Configure AI models, API keys, and prompts.</string>
+    <string name="ai_settings_title">AI Settings</string>
+    <string name="ai_api_key">API Key</string>
+    <string name="ai_api_key_summary">Enter your Gemini API key</string>
+    <string name="ai_model_name">Model Name</string>
+    <string name="ai_model_name_summary">e.g. gemini-2.0-flash, gemini-2.0-flash-thinking-exp-01-21</string>
+    <string name="ai_temperature">Temperature</string>
+    <string name="ai_temperature_summary">Controls randomness: %1$.1f</string>
+    <string name="ai_custom_config">Enable Custom Configuration</string>
+    <string name="ai_custom_config_summary">Use your own API key, model, and prompts</string>
+    <string name="ai_prompt_explain_code">Explain Code Prompt</string>
+    <string name="ai_prompt_generate_code">Generate Code Prompt</string>
+    <string name="ai_prompt_import_components">Import Components Prompt</string>
+    <string name="ai_prompt_complete_code">Complete Code Prompt</string>
+    <string name="ai_prompt_edit_code">Edit Code Prompt</string>
+    <string name="ai_reset_defaults">Reset to Defaults</string>
+    <string name="ai_reset_defaults_confirmation">Reset all AI settings to default values?</string>
+    <string name="ai_api_key_cleared">API key cleared</string>
+    <string name="ai_settings_reset">AI settings reset to defaults</string>
 </resources>

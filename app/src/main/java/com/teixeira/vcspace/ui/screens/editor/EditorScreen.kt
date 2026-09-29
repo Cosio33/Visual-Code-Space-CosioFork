@@ -55,7 +55,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.itsvks.monaco.MonacoEditor
 import com.itsvks.monaco.MonacoLanguage
 import com.itsvks.monaco.MonacoTheme
@@ -74,7 +73,7 @@ import com.teixeira.vcspace.activities.Editor.LocalEditorSnackbarHostState
 import com.teixeira.vcspace.compose.ui.EditorTab
 import com.teixeira.vcspace.compose.ui.dialog.ConfirmDialog
 import com.teixeira.vcspace.core.EventManager
-import com.teixeira.vcspace.core.ai.Gemini
+import com.teixeira.vcspace.core.ai.AiManager
 import com.teixeira.vcspace.core.settings.Settings.Editor.rememberColorScheme
 import com.teixeira.vcspace.core.settings.Settings.Editor.rememberCurrentEditor
 import com.teixeira.vcspace.core.settings.Settings.Editor.rememberDeleteIndentOnBackspace
@@ -109,6 +108,7 @@ import com.teixeira.vcspace.editor.TextActionsWindow
 import com.teixeira.vcspace.editor.VCSpaceEditor
 import com.teixeira.vcspace.editor.addBlockComment
 import com.teixeira.vcspace.editor.addSingleComment
+import com.teixeira.vcspace.editor.listener.OnEditCodeListener
 import com.teixeira.vcspace.editor.listener.OnExplainCodeListener
 import com.teixeira.vcspace.editor.listener.OnImportComponentListener
 import com.teixeira.vcspace.editor.textaction.EditorTextActionItem
@@ -122,6 +122,7 @@ import com.teixeira.vcspace.keyboard.model.toShortcut
 import com.teixeira.vcspace.plugins.DialogManager
 import com.teixeira.vcspace.resources.R
 import com.teixeira.vcspace.ui.LocalToastHostState
+import com.teixeira.vcspace.ui.components.ai.EditCodeDialog
 import com.teixeira.vcspace.ui.components.keyboard.CommandPalette
 import com.teixeira.vcspace.ui.screens.editor.ai.CodeExplanationSheet
 import com.teixeira.vcspace.ui.screens.editor.ai.ImportComponentsSheet
@@ -170,8 +171,8 @@ fun EditorScreen(
     val toastHostState = LocalEditorSnackbarHostState.current
     val commandPaletteManager = LocalCommandPaletteManager.current
 
-    var codeExplanationResponse: GenerateContentResponse? by remember { mutableStateOf(null) }
-    var importComponentResponse: GenerateContentResponse? by remember { mutableStateOf(null) }
+    var codeExplanationResponse: com.teixeira.vcspace.core.ai.AiResponse? by remember { mutableStateOf(null) }
+    var importComponentResponse: com.teixeira.vcspace.core.ai.AiResponse? by remember { mutableStateOf(null) }
 
     codeExplanationResponse?.let {
         CodeExplanationSheet(
@@ -507,12 +508,14 @@ private fun ConfigureMonacoEditor(
 @Composable
 fun SoraEditor(
     editorView: CodeEditorView,
-    onExplainCodeResponse: (GenerateContentResponse) -> Unit = {},
-    onImportComponentResponse: (GenerateContentResponse) -> Unit = {}
+    onExplainCodeResponse: (com.teixeira.vcspace.core.ai.AiResponse) -> Unit = {},
+    onImportComponentResponse: (com.teixeira.vcspace.core.ai.AiResponse) -> Unit = {}
 ) {
     val context = LocalContext.current
     val toastHostState = LocalToastHostState.current
     val scope = rememberCoroutineScope()
+
+    val provider = remember { AiManager.getProvider(context) }
 
     ConfigureEditor(
         editorView.editor, onExplainCodeListener = { code ->
@@ -526,7 +529,7 @@ fun SoraEditor(
                     }
                 }
             ) { _, _ ->
-                Gemini.explainCode(code.toString())
+                provider.explainCode(code.toString())
                     .onSuccess(onExplainCodeResponse)
                     .onFailure {
                         scope.launch {
@@ -549,7 +552,7 @@ fun SoraEditor(
                     }
                 }
             ) { _, _ ->
-                Gemini.importComponents(code.toString())
+                provider.importComponents(code.toString())
                     .onSuccess(onImportComponentResponse)
                     .onFailure {
                         scope.launch {
@@ -576,6 +579,32 @@ private fun ConfigureEditor(
         }
     }
     val editorTextActionWindowExpandThreshold by rememberEditorTextActionWindowExpandThreshold()
+
+    var editCodeSelectedText by remember { mutableStateOf<CharSequence?>(null) }
+    var editorForEditCode by remember { mutableStateOf<VCSpaceEditor?>(null) }
+    var editCodeCursorLeftLine by remember { mutableStateOf(0) }
+    var editCodeCursorLeftColumn by remember { mutableStateOf(0) }
+    var editCodeCursorRightLine by remember { mutableStateOf(0) }
+    var editCodeCursorRightColumn by remember { mutableStateOf(0) }
+
+    editCodeSelectedText?.let { selectedCode ->
+        editorForEditCode?.let { ed ->
+            val codeEditorView = ed.parent as? CodeEditorView
+            EditCodeDialog(
+                editor = codeEditorView ?: ed,
+                selectedCode = selectedCode,
+                fileExtension = ed.file?.extension,
+                cursorLeftLine = editCodeCursorLeftLine,
+                cursorLeftColumn = editCodeCursorLeftColumn,
+                cursorRightLine = editCodeCursorRightLine,
+                cursorRightColumn = editCodeCursorRightColumn,
+                onDismiss = {
+                    editCodeSelectedText = null
+                    editorForEditCode = null
+                }
+            )
+        }
+    }
 
     val editorTextActionWindow = editorTextActionWindow(
         items = items,
@@ -644,6 +673,20 @@ private fun ConfigureEditor(
                     )
                 )
             }
+
+            R.string.editor_action_edit_with_ai -> {
+                val content = editor.text
+                val cursor = content.cursor
+                editCodeSelectedText = content.substring(
+                    cursor.left,
+                    cursor.right
+                )
+                editCodeCursorLeftLine = cursor.leftLine
+                editCodeCursorLeftColumn = cursor.leftColumn
+                editCodeCursorRightLine = cursor.rightLine
+                editCodeCursorRightColumn = cursor.rightColumn
+                editorForEditCode = editor
+            }
         }
     }
 
@@ -682,6 +725,9 @@ private fun ConfigureEditor(
 
             // Import Action
             updateAction(8, editor.cursor.isSelected, editor.cursor.isSelected)
+
+            // Edit with AI Action
+            updateAction(9, editor.cursor.isSelected, editor.cursor.isSelected)
         }
     }
 

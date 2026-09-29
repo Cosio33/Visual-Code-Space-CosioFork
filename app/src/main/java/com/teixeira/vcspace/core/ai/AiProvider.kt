@@ -13,27 +13,12 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.teixeira.vcspace.ui.screens
+package com.teixeira.vcspace.core.ai
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-sealed class SettingScreens {
-    @Serializable
-    data object Default : SettingScreens()
-
-    @Serializable
-    data object General : SettingScreens()
-
-    @Serializable
-    data object File : SettingScreens()
-
-    @Serializable
-    data object Editor : SettingScreens()
-
-    @Serializable
-    data object MonacoEditor : SettingScreens()
-
-    @Serializable
-    data object Ai : SettingScreens()
+interface AiProvider {
+    suspend fun explainCode(code: String): Result<AiResponse>
+    suspend fun importComponents(code: String): Result<AiResponse>
+    suspend fun generateCode(prompt: String, fileExtension: String? = null): Result<AiResponse>
+    suspend fun completeCode(completionMetadata: CompletionMetadata): Result<AiResponse>
+    suspend fun editCode(code: String, instructions: String, language: String = ""): Result<AiResponse>
 }

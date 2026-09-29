@@ -106,6 +106,15 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     )
 
                     preference(
+                        key = "pref_configure_ai_key",
+                        title = { Text(stringResource(strings.pref_configure_ai)) },
+                        summary = { Text(stringResource(strings.pref_configure_ai_summary)) },
+                        onClick = {
+                            navController.navigateSingleTop(SettingScreens.Ai)
+                        }
+                    )
+
+                    preference(
                         key = "pref_configure_plugins_key",
                         title = { Text(stringResource(strings.pref_configure_plugins)) },
                         summary = { Text(stringResource(strings.pref_configure_plugins_summary)) },
@@ -221,6 +230,15 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 MonacoEditorSettingsScreen(
                     modifier = modifier,
                     onNavigateUp = { navController.navigateSingleTop(SettingScreens.Editor) }
+                )
+            }
+        }
+
+        composable<SettingScreens.Ai> {
+            ProvidePreferenceLocals {
+                AiSettingsScreen(
+                    modifier = modifier,
+                    onNavigateUp = navController::navigateUp
                 )
             }
         }

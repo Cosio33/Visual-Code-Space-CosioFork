@@ -43,21 +43,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.ai.client.generativeai.type.GenerateContentResponse
-import com.google.ai.client.generativeai.type.asTextOrNull
+import com.teixeira.vcspace.core.ai.AiResponse
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AiResponseSheet(
     title: String,
-    response: GenerateContentResponse,
+    response: AiResponse,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     subtitle: (@Composable () -> Unit)? = null,
 ) {
-    val text = response.candidates[0].content.parts[0].asTextOrNull().toString()
-    val usageMetadata = response.usageMetadata
+    val text = response.text
 
     var showUsageMetadata by remember { mutableStateOf(false) }
 
@@ -98,16 +96,26 @@ fun AiResponseSheet(
                 }
 
                 AnimatedVisibility(visible = showUsageMetadata) {
-                    Text(
-                        text = "total: ${usageMetadata?.totalTokenCount}, prompt: ${usageMetadata?.promptTokenCount}, candidates: ${usageMetadata?.candidatesTokenCount}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.W200,
-                        modifier = Modifier.clickable(
-                            onClick = { showUsageMetadata = !showUsageMetadata },
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
+                    val total = response.totalTokenCount
+                    val prompt = response.promptTokenCount
+                    val candidates = response.candidatesTokenCount
+
+                    if (total != null || prompt != null || candidates != null) {
+                        Text(
+                            text = buildString {
+                                total?.let { append("total: $it") }
+                                prompt?.let { append(if (isNotEmpty()) ", " else ""); append("prompt: $it") }
+                                candidates?.let { append(if (isNotEmpty()) ", " else ""); append("candidates: $it") }
+                            },
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.W200,
+                            modifier = Modifier.clickable(
+                                onClick = { showUsageMetadata = !showUsageMetadata },
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            )
                         )
-                    )
+                    }
                 }
             }
 

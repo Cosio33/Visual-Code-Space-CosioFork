@@ -188,6 +188,8 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
 
+    implementation(libs.androidx.security.crypto)
+
     implementation(libs.nanohttpd)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

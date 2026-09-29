@@ -22,13 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.teixeira.vcspace.app.strings
+import com.teixeira.vcspace.core.ai.AiResponse
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun CodeExplanationSheet(
-    response: GenerateContentResponse,
+    response: AiResponse,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
