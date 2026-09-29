@@ -5,9 +5,14 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -46,23 +51,13 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: ${{ env.RELEASE_NOTES }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+          files: app/build/outputs/apk/release/app-release.apk
           draft: false
           prerelease: false
-          
-      - name: Upload APK to Release
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/release/app-release.apk
-          asset_name: app-release.apk
-          asset_content_type: application/vnd.android.package-archive
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
